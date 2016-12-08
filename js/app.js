@@ -10,6 +10,8 @@ var BLOCK_HEIGHT = 83;
 var PLAYER_X = BLOCK_WIDTH * 2;
 var PLAYER_Y = BLOCK_HEIGHT * 5;
 
+// enemys' offset on y-axis for them to stay middle vertically with a block
+var ENEMY_Y_OFFSET = - 20;
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -24,7 +26,7 @@ var Enemy = function() {
     // x: set the Enemy to be out of the canvas
     // y: set the Enemy to be in a random row of 3 stone rows
     this.x = - BLOCK_WIDTH - WIDTH * Math.random()/ 2;
-    this.y = 63 + BLOCK_HEIGHT * ( Math.floor( 3 * Math.random() ) );
+    this.y = ENEMY_Y_OFFSET + BLOCK_HEIGHT * (Math.floor(3 * Math.random()) + 2);
 
     // set speed for a Enemy within [30, 70)
     this.speed = 250 + 300 * (Math.random() - 0.5);
@@ -42,11 +44,13 @@ Enemy.prototype.update = function(dt) {
         Enemy.call(this);
     }
     else {
-        this.x += this.speed *dt;
+        this.x += this.speed * dt;
     }
 
     // check collipse
-    if ((Math.abs(this.x - player.x) < BLOCK_WIDTH - 20) && (Math.abs(this.y - player.y) < 63)) {
+    // width of the player is 20px shorter than BLOCK_WIDTH
+    if ( Math.abs(this.x - player.x) < BLOCK_WIDTH - 20 &&
+        Math.abs(this.y - player.y) < BLOCK_HEIGHT + ENEMY_Y_OFFSET) {
         // Player.call(Player);
         player.x = PLAYER_X;
         player.y = PLAYER_Y;
