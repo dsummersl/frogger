@@ -13,7 +13,7 @@ var PLAYER_Y = BLOCK_HEIGHT * 5;
 // enemys' offset on y-axis for them to stay middle vertically with a block
 var ENEMY_Y_OFFSET = - 20;
 
-// Enemies our player must avoid
+// Enemies our currentPlayer must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -49,11 +49,11 @@ Enemy.prototype.update = function(dt) {
 
     // check collipse
     // width of the player is 20px shorter than BLOCK_WIDTH
-    if ( Math.abs(this.x - player.x) < BLOCK_WIDTH - 20 &&
-        Math.abs(this.y - player.y) < BLOCK_HEIGHT + ENEMY_Y_OFFSET) {
+    if ( Math.abs(this.x - currentPlayer.x) < BLOCK_WIDTH - 20 &&
+        Math.abs(this.y - currentPlayer.y) < BLOCK_HEIGHT + ENEMY_Y_OFFSET) {
         // Player.call(Player);
-        player.x = PLAYER_X;
-        player.y = PLAYER_Y;
+        currentPlayer.x = PLAYER_X;
+        currentPlayer.y = PLAYER_Y;
     }
 };
 
@@ -62,12 +62,12 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
+// Now write your own Player class
 // This class requires an update(), render() and
 // a handleInput() method.
-var Player = function() {
-    // set sprite for the Player
-    this.sprite = 'images/char-horn-girl.png';
+var Player = function(char) {
+    // set sprite for the Player according to its character set
+    this.sprite = 'images/char-' + char + '.png';
 
     // initialize position of the Player
     this.x = PLAYER_X;
@@ -78,7 +78,7 @@ var Player = function() {
     this.yMove = 0;
 }
 
-// Update the player's position
+// Update the currentPlayer's position
 Player.prototype.update = function() {
     this.x += this.xMove;
     this.y += this.yMove;
@@ -88,32 +88,32 @@ Player.prototype.update = function() {
     this.yMove = 0;
 }
 
-// Draw the player on the screen
+// Draw the player(s) on the screen
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 // set move values according to user's keyboard input
-// check if the input counts for a move according to player's position
+// check if the input counts for a move according to currentPlayer's position
 Player.prototype.handleInput = function(key) {
     switch (key) {
         case 'left':
-            if (player.x > 0) {
+            if (currentPlayer.x > 0) {
                 this.xMove = - BLOCK_WIDTH;
             }
             break;
         case 'up':
-            if (player.y > 0) {
+            if (currentPlayer.y > 0) {
                 this.yMove = - BLOCK_HEIGHT;
             }
             break;
         case 'right':
-            if (player.x < BLOCK_WIDTH *4) {
+            if (currentPlayer.x < BLOCK_WIDTH *4) {
                 this.xMove = BLOCK_WIDTH;
             }
             break;
         case 'down':
-            if (player.y < BLOCK_HEIGHT *5) {
+            if (currentPlayer.y < BLOCK_HEIGHT *5) {
                 this.yMove = BLOCK_HEIGHT;
             }
             break;
@@ -124,10 +124,12 @@ Player.prototype.handleInput = function(key) {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-// var allEnemies = [new Enemy];
+// Place all player object in an array called allPlayers
+// Initialize the currentPlayer object to be the first in allPlayers array
 var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
-var player = new Player;
+var allPlayers = [new Player('boy'), new Player('pink-girl'), new Player('cat-girl'),
+                  new Player('horn-girl'), new Player('princess-girl')];
+var currentPlayer = allPlayers[0];
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -139,5 +141,5 @@ document.addEventListener('keyup', function(e) {
         40: 'down'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    currentPlayer.handleInput(allowedKeys[e.keyCode]);
 });
