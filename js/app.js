@@ -150,17 +150,10 @@ Player.prototype.render = function() {
         ctx.fillStyle = "black";
         ctx.textAlign = "left";
         ctx.fillText("player: " + this.name, 0, 30);
+
         // display lives left
         ctx.textAlign = "right";
         ctx.fillText("lives: " + this.lives, WIDTH, 30);
-        if (IN_GAME == 'false') {
-            ctx.font = "60px 'Nunito Sans', sans-serif";
-            ctx.fillStyle = "white";
-            ctx.strokeStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText("GAME OVER", WIDTH/2, HEIGHT/2);
-            ctx.strokeText("GAME OVER", WIDTH/2, HEIGHT/2);
-        }
     }
 }
 
@@ -198,6 +191,18 @@ Player.prototype.handleInput = function(key) {
             default:
                 break;
         }
+    }
+}
+
+// display game over
+var renderGameOver = function() {
+    if (IN_GAME == 'false') {
+        ctx.font = "60px 'Nunito Sans', sans-serif";
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", WIDTH/2, HEIGHT/2);
+        ctx.strokeText("GAME OVER", WIDTH/2, HEIGHT/2);
     }
 }
 

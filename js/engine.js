@@ -155,6 +155,8 @@ var Engine = (function(global) {
         allPlayers.forEach(function(player) {
             player.render();
         });
+        
+        renderGameOver();
     }
 
     /* This function does nothing but it could have been a good place to
