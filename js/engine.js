@@ -147,11 +147,16 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
+        if (typeof(theStar) != 'undefined') {
+            theStar.render();
+        }
+
+        theGem.render();
 
         allRocks.forEach(function(rock) {
             rock.render();
         });
-        
+
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
@@ -186,7 +191,9 @@ var Engine = (function(global) {
         'images/char-cat-girl.png',
         'images/char-horn-girl.png',
         'images/char-princess-girl.png',
-        'images/Rock.png'
+        'images/Rock.png',
+        'images/Star.png',
+        'images/Gem.png'
     ]);
     Resources.onReady(init);
 
