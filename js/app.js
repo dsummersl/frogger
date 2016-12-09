@@ -7,7 +7,7 @@
 var BLOCK_WIDTH = 101;
 var BLOCK_HEIGHT = 83;
 
-// row & column of the block-background
+// row & column of the blockMatrix
 var ROW = 6;
 var COLUMN = 5;
 
@@ -22,10 +22,12 @@ var PLAYER_Y = 5;
 // enemys' offset on y-axis for them to stay middle vertically with a block
 var ENEMY_Y_OFFSET = -0.2;
 
-// define an array to store blocks occupied by other elements -- such as rocks,
-// other players that the currentPlayer can't get in
-// element format: [x, y], represents coodinates of the block's top left corner
-// var occupiedBlock = [];
+// define an array as flag of being occupied by other elements,
+// such as rocks, other players;
+// for a block ABC on row:2, col:4, let ABC_index = (2*COLUMN + 4*ROW),
+// if it's blocked, then let occupiedBlocks[ABC_index] = 1
+var occupiedBlocks = [];
+occupiedBlocks[26] = 1;
 
 // Enemies our currentPlayer must avoid
 var Enemy = function() {
@@ -94,17 +96,22 @@ var Player = function(char) {
     // move values for updating the position, acquired in .handleInput()
     this.xMove = 0;
     this.yMove = 0;
+
+    // position index of the player in the blockMatrix
+    this.posIndex = this.y * COLUMN + this.x;
 }
 
 // Update the currentPlayer's position
 Player.prototype.update = function() {
     this.x += this.xMove;
     this.y += this.yMove;
+    this.posIndex = this.y * COLUMN + this.x;
 
     // check if the currentPlayer is now on the other side
     if (this.y == 0) {
         if (currentPlayerNum < 4) {
-            // add this player's position to the occupied block array
+            // add this player's position index into occupiedBlocks
+            occupiedBlocks[this.posIndex] = 1;
 
             // set currentPlayer to be the next player
             currentPlayerNum++;
@@ -131,22 +138,28 @@ Player.prototype.render = function() {
 Player.prototype.handleInput = function(key) {
     switch (key) {
         case 'left':
-            if (currentPlayer.x > 0) {
+            console.log(occupiedBlocks);
+            console.log(this.posIndex);
+            if (currentPlayer.x > 0 &&
+            occupiedBlocks[this.posIndex - 1] != 1) {
                 this.xMove = -1;
             }
             break;
         case 'up':
-            if (currentPlayer.y > 0) {
+            if (currentPlayer.y > 0 &&
+            occupiedBlocks[this.posIndex - COLUMN] != 1) {
                 this.yMove = -1;
             }
             break;
         case 'right':
-            if (currentPlayer.x < COLUMN - 1) {
+            if (currentPlayer.x < COLUMN - 1 &&
+            occupiedBlocks[this.posIndex + 1] != 1) {
                 this.xMove = 1;
             }
             break;
         case 'down':
-            if (currentPlayer.y < ROW - 1) {
+            if (currentPlayer.y < ROW - 1 &&
+            occupiedBlocks[this.posIndex + COLUMN] != 1) {
                 this.yMove = 1;
             }
             break;
