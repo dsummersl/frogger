@@ -30,7 +30,7 @@ var IN_GAME = 'true';
 // for a block ABC on row:2, col:4, let ABC_index = (2*COLUMN + 4*ROW),
 // if it's blocked, then let occupiedBlocks[ABC_index] = 1
 var occupiedBlocks = [];
-occupiedBlocks[26] = 1;
+// occupiedBlocks[26] = 1;
 
 // Enemies our currentPlayer must avoid
 var Enemy = function() {
@@ -194,6 +194,29 @@ Player.prototype.handleInput = function(key) {
     }
 }
 
+// rock class, occupy blocks so that player can't get in
+var Rock = function() {
+    this.sprite = 'images/Rock.png';
+
+    // rocks appear in row3 ~ row5
+    this.x = Math.round(5 * Math.random());
+    this.y = 3 + Math.round(2 * Math.random());
+
+    if (this.x == 2 && this.y == 5) {
+        this.y--;
+    }
+
+    // add rock's position index into occupiedBlocks
+    this.posIndex = this.y * COLUMN + this.x;
+    occupiedBlocks[this.posIndex] = 1;
+
+    // draw the rock
+    this.render = function() {
+        ctx.drawImage(Resources.get(this.sprite),
+                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
+    }
+}
+
 // display game over
 var renderGameOver = function() {
     if (IN_GAME == 'false') {
@@ -218,6 +241,9 @@ var allPlayers = [new Player('boy'), new Player('pink-girl'), new Player('cat-gi
 var currentPlayerNum = 0;
 var currentPlayer = allPlayers[currentPlayerNum];
 currentPlayer.draw = 'true';
+
+// Initialize 2 rocks
+var allRocks = [new Rock, new Rock];
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
