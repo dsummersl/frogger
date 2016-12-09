@@ -151,7 +151,10 @@ var Engine = (function(global) {
             enemy.render();
         });
 
-        currentPlayer.render();
+        // currentPlayer.render();
+        allPlayers.forEach(function(player) {
+            player.render();
+        });
     }
 
     /* This function does nothing but it could have been a good place to

@@ -1,17 +1,31 @@
-// size of canvas
-var WIDTH = 505;
-var HEIGHT = 606;
+// Note:
+// position of objects in this program is in unit length,
+// i.e., if the coodinates of an object is [1, 1],
+// it refers to [1*BLOCK_WIDTH, 1*BLOCK_HEIGHT] on the canvas
 
 // size of each block
 var BLOCK_WIDTH = 101;
 var BLOCK_HEIGHT = 83;
 
+// row & column of the block-background
+var ROW = 6;
+var COLUMN = 5;
+
+// size of canvas
+var WIDTH = BLOCK_WIDTH * COLUMN;
+var HEIGHT = BLOCK_HEIGHT * ROW + 100;
+
 // initial position of the player
-var PLAYER_X = BLOCK_WIDTH * 2;
-var PLAYER_Y = BLOCK_HEIGHT * 5;
+var PLAYER_X = 2;
+var PLAYER_Y = 5;
 
 // enemys' offset on y-axis for them to stay middle vertically with a block
-var ENEMY_Y_OFFSET = - 20;
+var ENEMY_Y_OFFSET = -0.2;
+
+// define an array to store blocks occupied by other elements -- such as rocks,
+// other players that the currentPlayer can't get in
+// element format: [x, y], represents coodinates of the block's top left corner
+// var occupiedBlock = [];
 
 // Enemies our currentPlayer must avoid
 var Enemy = function() {
@@ -25,11 +39,11 @@ var Enemy = function() {
     // initialize position of a Enemy
     // x: set the Enemy to be out of the canvas
     // y: set the Enemy to be in a random row of 3 stone rows
-    this.x = - BLOCK_WIDTH - WIDTH * Math.random()/ 2;
-    this.y = ENEMY_Y_OFFSET + BLOCK_HEIGHT * (Math.floor(3 * Math.random()) + 2);
+    this.x = -3 + 2 * Math.random();
+    this.y = ENEMY_Y_OFFSET + (Math.floor(3 * Math.random()) + 2);
 
     // set speed for a Enemy within [30, 70)
-    this.speed = 250 + 300 * (Math.random() - 0.5);
+    this.speed = 2.5 + 3 * (Math.random() - 0.5);
 };
 
 // Update the enemy's position, required method for game
@@ -40,7 +54,7 @@ Enemy.prototype.update = function(dt) {
     // all computers.
 
     // if the bug crawls out of canvas, innitialize its position and speed again
-    if (this.x > WIDTH) {
+    if (this.x > COLUMN) {
         Enemy.call(this);
     }
     else {
@@ -48,9 +62,9 @@ Enemy.prototype.update = function(dt) {
     }
 
     // check collipse
-    // width of the player is 20px shorter than BLOCK_WIDTH
-    if ( Math.abs(this.x - currentPlayer.x) < BLOCK_WIDTH - 20 &&
-        Math.abs(this.y - currentPlayer.y) < BLOCK_HEIGHT + ENEMY_Y_OFFSET) {
+    // width of the player is 20px(0.24*BLOCK_WIDTH) shorter than BLOCK_WIDTH
+    if (Math.abs(this.x - currentPlayer.x) < 1 - 0.24 &&
+        Math.abs((this.y - ENEMY_Y_OFFSET) - currentPlayer.y) < 1) {
         // Player.call(Player);
         currentPlayer.x = PLAYER_X;
         currentPlayer.y = PLAYER_Y;
@@ -59,7 +73,8 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite),
+                  this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
 };
 
 // Now write your own Player class
@@ -68,6 +83,9 @@ Enemy.prototype.render = function() {
 var Player = function(char) {
     // set sprite for the Player according to its character set
     this.sprite = 'images/char-' + char + '.png';
+
+    // decide if the player should be drawn according to game process
+    this.draw = 'false';
 
     // initialize position of the Player
     this.x = PLAYER_X;
@@ -83,6 +101,18 @@ Player.prototype.update = function() {
     this.x += this.xMove;
     this.y += this.yMove;
 
+    // check if the currentPlayer is now on the other side
+    if (this.y == 0) {
+        if (currentPlayerNum < 4) {
+            // add this player's position to the occupied block array
+
+            // set currentPlayer to be the next player
+            currentPlayerNum++;
+            currentPlayer = allPlayers[currentPlayerNum];
+            currentPlayer.draw = 'true';
+        }
+    }
+
     // reset move values
     this.xMove = 0;
     this.yMove = 0;
@@ -90,7 +120,10 @@ Player.prototype.update = function() {
 
 // Draw the player(s) on the screen
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    if (this.draw == 'true') {
+        ctx.drawImage(Resources.get(this.sprite),
+                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
+    }
 }
 
 // set move values according to user's keyboard input
@@ -99,22 +132,22 @@ Player.prototype.handleInput = function(key) {
     switch (key) {
         case 'left':
             if (currentPlayer.x > 0) {
-                this.xMove = - BLOCK_WIDTH;
+                this.xMove = -1;
             }
             break;
         case 'up':
             if (currentPlayer.y > 0) {
-                this.yMove = - BLOCK_HEIGHT;
+                this.yMove = -1;
             }
             break;
         case 'right':
-            if (currentPlayer.x < BLOCK_WIDTH *4) {
-                this.xMove = BLOCK_WIDTH;
+            if (currentPlayer.x < COLUMN - 1) {
+                this.xMove = 1;
             }
             break;
         case 'down':
-            if (currentPlayer.y < BLOCK_HEIGHT *5) {
-                this.yMove = BLOCK_HEIGHT;
+            if (currentPlayer.y < ROW - 1) {
+                this.yMove = 1;
             }
             break;
         default:
@@ -124,12 +157,16 @@ Player.prototype.handleInput = function(key) {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
+// var allEnemies = [new Enemy];
+var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
+
 // Place all player object in an array called allPlayers
 // Initialize the currentPlayer object to be the first in allPlayers array
-var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
 var allPlayers = [new Player('boy'), new Player('pink-girl'), new Player('cat-girl'),
                   new Player('horn-girl'), new Player('princess-girl')];
-var currentPlayer = allPlayers[0];
+var currentPlayerNum = 0;
+var currentPlayer = allPlayers[currentPlayerNum];
+currentPlayer.draw = 'true';
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
