@@ -22,6 +22,9 @@ var PLAYER_Y = 5;
 // enemys' offset on y-axis for them to stay middle vertically with a block
 var ENEMY_Y_OFFSET = -0.2;
 
+// flag for game not over
+var IN_GAME = 'true';
+
 // define an array as flag of being occupied by other elements,
 // such as rocks, other players;
 // for a block ABC on row:2, col:4, let ABC_index = (2*COLUMN + 4*ROW),
@@ -67,7 +70,10 @@ Enemy.prototype.update = function(dt) {
     // width of the player is 20px(0.24*BLOCK_WIDTH) shorter than BLOCK_WIDTH
     if (Math.abs(this.x - currentPlayer.x) < 1 - 0.24 &&
         Math.abs((this.y - ENEMY_Y_OFFSET) - currentPlayer.y) < 1) {
-        // Player.call(Player);
+        currentPlayer.lives--;
+        if (currentPlayer.lives == 0) {
+            IN_GAME = 'false';
+        }
         currentPlayer.x = PLAYER_X;
         currentPlayer.y = PLAYER_Y;
     }
@@ -83,6 +89,9 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function(char) {
+    // set the player's name
+    this.name = char;
+
     // set sprite for the Player according to its character set
     this.sprite = 'images/char-' + char + '.png';
 
@@ -99,6 +108,9 @@ var Player = function(char) {
 
     // position index of the player in the blockMatrix
     this.posIndex = this.y * COLUMN + this.x;
+
+    // set lives for the player
+    this.lives = 2;
 }
 
 // Update the currentPlayer's position
@@ -130,41 +142,62 @@ Player.prototype.render = function() {
     if (this.draw == 'true') {
         ctx.drawImage(Resources.get(this.sprite),
                       this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
+        // display the current player
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, WIDTH, 40);
+
+        ctx.font = "24px 'Nunito Sans', sans-serif";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "left";
+        ctx.fillText("player: " + this.name, 0, 30);
+        // display lives left
+        ctx.textAlign = "right";
+        ctx.fillText("lives: " + this.lives, WIDTH, 30);
+        if (IN_GAME == 'false') {
+            ctx.font = "60px 'Nunito Sans', sans-serif";
+            ctx.fillStyle = "white";
+            ctx.strokeStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText("GAME OVER", WIDTH/2, HEIGHT/2);
+            ctx.strokeText("GAME OVER", WIDTH/2, HEIGHT/2);
+        }
     }
 }
 
 // set move values according to user's keyboard input
 // check if the input counts for a move according to currentPlayer's position
 Player.prototype.handleInput = function(key) {
-    switch (key) {
-        case 'left':
-            console.log(occupiedBlocks);
-            console.log(this.posIndex);
-            if (currentPlayer.x > 0 &&
-            occupiedBlocks[this.posIndex - 1] != 1) {
-                this.xMove = -1;
-            }
-            break;
-        case 'up':
-            if (currentPlayer.y > 0 &&
-            occupiedBlocks[this.posIndex - COLUMN] != 1) {
-                this.yMove = -1;
-            }
-            break;
-        case 'right':
-            if (currentPlayer.x < COLUMN - 1 &&
-            occupiedBlocks[this.posIndex + 1] != 1) {
-                this.xMove = 1;
-            }
-            break;
-        case 'down':
-            if (currentPlayer.y < ROW - 1 &&
-            occupiedBlocks[this.posIndex + COLUMN] != 1) {
-                this.yMove = 1;
-            }
-            break;
-        default:
-            break;
+    if (IN_GAME == 'true') {
+        switch (key) {
+            case 'left':
+                console.log(occupiedBlocks);
+                console.log(this.posIndex);
+                if (currentPlayer.x > 0 &&
+                occupiedBlocks[this.posIndex - 1] != 1) {
+                    this.xMove = -1;
+                }
+                break;
+            case 'up':
+                if (currentPlayer.y > 0 &&
+                occupiedBlocks[this.posIndex - COLUMN] != 1) {
+                    this.yMove = -1;
+                }
+                break;
+            case 'right':
+                if (currentPlayer.x < COLUMN - 1 &&
+                occupiedBlocks[this.posIndex + 1] != 1) {
+                    this.xMove = 1;
+                }
+                break;
+            case 'down':
+                if (currentPlayer.y < ROW - 1 &&
+                occupiedBlocks[this.posIndex + COLUMN] != 1) {
+                    this.yMove = 1;
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 
