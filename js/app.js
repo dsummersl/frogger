@@ -23,7 +23,7 @@ var PLAYER_Y = 5;
 var ENEMY_Y_OFFSET = -0.2;
 
 // flag for game not over
-var IN_GAME = 'true';
+var inGame = 'true';
 
 // define an array as flag of being occupied by other elements,
 // such as rocks, other players;
@@ -68,14 +68,20 @@ Enemy.prototype.update = function(dt) {
         this.x += this.speed * dt;
     }
 
-    // check collipse
+    // check collipse and game over
     // width of the player is 20px(0.24*BLOCK_WIDTH) shorter than BLOCK_WIDTH
     if (Math.abs(this.x - currentPlayer.x) < 1 - 0.24 &&
         Math.abs((this.y - ENEMY_Y_OFFSET) - currentPlayer.y) < 1) {
-        currentPlayer.lives--;
-        if (currentPlayer.lives == 0) {
-            IN_GAME = 'false';
+        if (starLife + currentPlayer.lives == 1) {
+            inGame = 'false';
         }
+        if (currentPlayer.lives == 0) {
+            starLife--;
+        }
+        else {
+            currentPlayer.lives--;
+        }
+
         currentPlayer.x = PLAYER_X;
         currentPlayer.y = PLAYER_Y;
     }
@@ -131,6 +137,28 @@ Player.prototype.update = function() {
             currentPlayerNum++;
             currentPlayer = allPlayers[currentPlayerNum];
             currentPlayer.draw = 'true';
+
+            // new star and gem
+            // if the star for previous player isn't got, don't create another
+            if (typeof theStar != 'undefined' && theStar.get == 'false') {
+                funObjIndex.splice(3, 1);
+            }
+            else {
+                if (Math.random() < 0.5) {
+                    funObjIndex.splice(2, 2);
+                    theStar = new Star();
+                }
+            }
+            theGem = new Gem();
+            console.log(funObjIndex);
+        }
+    }
+
+    // check if the currentPlayer got the start
+    if (typeof theStar != 'undefined') {
+        if (this.x == theStar.x && this.y == theStar.y && theStar.get == 'false') {
+            theStar.get = 'true';
+            starLife++;
         }
     }
 
@@ -150,11 +178,9 @@ Player.prototype.render = function() {
 // set move values according to user's keyboard input
 // check if the input counts for a move according to currentPlayer's position
 Player.prototype.handleInput = function(key) {
-    if (IN_GAME == 'true') {
+    if (inGame == 'true') {
         switch (key) {
             case 'left':
-                console.log(occupiedBlocks);
-                console.log(this.posIndex);
                 if (currentPlayer.x > 0 &&
                 occupiedBlocks[this.posIndex - 1] != 1) {
                     this.xMove = -1;
@@ -184,76 +210,74 @@ Player.prototype.handleInput = function(key) {
     }
 }
 
-// generate unique index for "fun" objects, including 2 rocks, 1 star, 1 Gem
-var funIndexGenerator = function() {
-    var funObjIndex = [PLAYER_Y * COLUMN + PLAYER_X];
-    // rocks appear in row2 ~ row5
-    for (j = 0; j < 2; j++) {
-        do {
-            var tempIndex = 2 * COLUMN + Math.floor(4 * COLUMN * Math.random());
-            var exist = funObjIndex.indexOf(tempIndex) !== -1;
-        } while (exist);
-        funObjIndex.push(tempIndex);
-    }
-    // Star and Gem appear in row2 ~ row4
-    for (j = 0; j < 2; j++) {
-        do {
-            var tempIndex = 2 * COLUMN + Math.floor(3 * COLUMN * Math.random());
-            var exist = funObjIndex.indexOf(tempIndex) !== -1;
-        } while (exist);
-        funObjIndex.push(tempIndex);
-    }
+// generate unique index for "fun" objects, such as rocks, star, Gem
+var funIndexGenerator = function(funObjIndex, numOfRow) {
+    // numOfRow: started from row2, the number of rows that the object could appear
+    // fun objects can't appear on the player's initial position
+    funObjIndex.unshift(PLAYER_Y * COLUMN + PLAYER_X);
+    // fun objects should have non-repeat indices
+    do {
+        var tempIndex = 2 * COLUMN + Math.floor(numOfRow * COLUMN * Math.random());
+        var exist = funObjIndex.indexOf(tempIndex) !== -1;
+    } while (exist);
+    funObjIndex.push(tempIndex);
+    // the player's initial index is actually not a funObjIndex, so shift it out
     funObjIndex.shift();
-    return funObjIndex;
+    return tempIndex;
 }
 
 // rock class, occupy blocks so that player can't get in
-var Rock = function(index) {
+var Rock = function() {
     this.sprite = 'images/Rock.png';
 
     // add rock's position index into occupiedBlocks
-    this.posIndex = index;
+    this.posIndex = funIndexGenerator(funObjIndex, 4);
     occupiedBlocks[this.posIndex] = 1;
 
     // rocks appear in row2 ~ row5
-    this.y = Math.floor(index/COLUMN);
-    this.x = index - this.y * COLUMN;
+    this.y = Math.floor(this.posIndex/COLUMN);
+    this.x = this.posIndex - this.y * COLUMN;
 
     // draw the rock
     this.render = function() {
         ctx.drawImage(Resources.get(this.sprite),
                       this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
     }
-
-    console.log([this.x, this.y]);
 }
 
 // star class, gives player extra life that can be passed to the next
-var Star = function(index) {
+var Star = function() {
     this.sprite = 'images/Star.png';
 
-    this.posIndex = index;
+    // generate index for the star
+    this.posIndex = funIndexGenerator(funObjIndex, 3);
 
     // star appear in row2 ~ row4
-    this.y = Math.floor(index/COLUMN);
-    this.x = index - this.y * COLUMN;
+    this.y = Math.floor(this.posIndex/COLUMN);
+    this.x = this.posIndex - this.y * COLUMN;
+
+    // flag for being got by player
+    this.get = 'false';
 
     // draw the star
     this.render = function() {
-        ctx.drawImage(Resources.get(this.sprite),
-                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
+        if (this.get == 'false') {
+            ctx.drawImage(Resources.get(this.sprite),
+                          this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
+        }
     }
 }
 
 // gem class, enables player to cross water
-var Gem = function(index) {
+var Gem = function() {
     this.sprite = 'images/Gem.png';
 
-    this.posIndex = index;
+    // generate index for the star
+    this.posIndex = funIndexGenerator(funObjIndex, 3);
 
     // Gem appear in row2 ~ row4
-    this.y = Math.floor(index/COLUMN);
-    this.x = index - this.y * COLUMN;
+    this.y = Math.floor(this.posIndex/COLUMN);
+    this.x = this.posIndex - this.y * COLUMN;
 
     // draw the gem
     this.render = function() {
@@ -279,7 +303,7 @@ var renderGameInfo = function() {
                   String.fromCharCode(9829) + ": " + starLife, WIDTH, 30);
 
     // game over
-    if (IN_GAME == 'false') {
+    if (inGame == 'false') {
         ctx.font = "60px 'Nunito Sans', sans-serif";
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
@@ -291,8 +315,8 @@ var renderGameInfo = function() {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-// var allEnemies = [new Enemy];
-var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
+var allEnemies = [new Enemy];
+// var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
 
 // Place all player object in an array called allPlayers
 // Initialize the currentPlayer object to be the first in allPlayers array
@@ -303,18 +327,19 @@ var currentPlayer = allPlayers[currentPlayerNum];
 currentPlayer.draw = 'true';
 
 // generate index for 2 rocks, 1 star, 1 Gem
-var funObjIndex = funIndexGenerator();
+var funObjIndex = [];
 
 // Initialize 2 rocks
-var allRocks = [new Rock(funObjIndex[0]), new Rock(funObjIndex[1])];
+var allRocks = [new Rock(), new Rock()];
 
 // Initialize 1 Star, 50% possibility to meet star per player
 if (Math.random() < 0.5) {
-    var theStar = new Star(funObjIndex[2]);
+    var theStar = new Star();
 }
 
 // Initialize 1 Gem
-var theGem = new Gem(funObjIndex[3]);
+var theGem = new Gem();
+console.log(funObjIndex);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
