@@ -166,7 +166,7 @@ var Engine = (function(global) {
             player.render();
         });
 
-        renderGameOver();
+        renderGameInfo();
     }
 
     /* This function does nothing but it could have been a good place to

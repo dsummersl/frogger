@@ -30,7 +30,9 @@ var IN_GAME = 'true';
 // for a block ABC on row:2, col:4, let ABC_index = (2*COLUMN + 4*ROW),
 // if it's blocked, then let occupiedBlocks[ABC_index] = 1
 var occupiedBlocks = [];
-// occupiedBlocks[26] = 1;
+
+// number of stars, represent for extra life
+var starLife = 0;
 
 // Enemies our currentPlayer must avoid
 var Enemy = function() {
@@ -142,18 +144,6 @@ Player.prototype.render = function() {
     if (this.draw == 'true') {
         ctx.drawImage(Resources.get(this.sprite),
                       this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
-        // display the current player
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, WIDTH, 40);
-
-        ctx.font = "24px 'Nunito Sans', sans-serif";
-        ctx.fillStyle = "black";
-        ctx.textAlign = "left";
-        ctx.fillText("player: " + this.name, 0, 30);
-
-        // display lives left
-        ctx.textAlign = "right";
-        ctx.fillText("lives: " + this.lives, WIDTH, 30);
     }
 }
 
@@ -272,8 +262,23 @@ var Gem = function(index) {
     }
 }
 
-// display game over
-var renderGameOver = function() {
+// display game information, such as current player, lives left, game over
+var renderGameInfo = function() {
+    // the current player
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, WIDTH, 40);
+
+    ctx.font = "24px 'Nunito Sans', sans-serif";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "left";
+    ctx.fillText("player: " + currentPlayer.name, 0, 30);
+
+    // lives left
+    ctx.textAlign = "right";
+    ctx.fillText("lives: " + currentPlayer.lives + "    " +
+                  String.fromCharCode(9829) + ": " + starLife, WIDTH, 30);
+
+    // game over
     if (IN_GAME == 'false') {
         ctx.font = "60px 'Nunito Sans', sans-serif";
         ctx.fillStyle = "white";
