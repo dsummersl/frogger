@@ -123,6 +123,13 @@ var Player = function(char) {
 
 // Update the currentPlayer's position
 Player.prototype.update = function() {
+    // check if the currentPlayer got the gem
+    if (this.x == theGem.x && this.y == theGem.y) {
+        theGem.get = 'true';
+        theGem.x += this.xMove;
+        theGem.y += this.yMove;
+    }
+
     this.x += this.xMove;
     this.y += this.yMove;
     this.posIndex = this.y * COLUMN + this.x;
@@ -154,7 +161,7 @@ Player.prototype.update = function() {
         }
     }
 
-    // check if the currentPlayer got the start
+    // check if the currentPlayer got the star
     if (typeof theStar != 'undefined') {
         if (this.x == theStar.x && this.y == theStar.y && theStar.get == 'false') {
             theStar.get = 'true';
@@ -189,6 +196,9 @@ Player.prototype.handleInput = function(key) {
             case 'up':
                 if (currentPlayer.y > 0 &&
                 occupiedBlocks[this.posIndex - COLUMN] != 1) {
+                    if (currentPlayer.y == 2 && theGem.get == 'false') {
+                        break;
+                    }
                     this.yMove = -1;
                 }
                 break;
@@ -278,6 +288,9 @@ var Gem = function() {
     // Gem appear in row2 ~ row4
     this.y = Math.floor(this.posIndex/COLUMN);
     this.x = this.posIndex - this.y * COLUMN;
+
+    // flag for being got by player
+    this.get = 'false';
 
     // draw the gem
     this.render = function() {
