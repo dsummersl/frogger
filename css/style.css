@@ -1,3 +1,23 @@
 body {
+    font-family: "Nunito Sans", sans-serif;
+}
+
+#playground {
+    /*text-align: center;*/
+    display: flex;
+    width: 840px;
+    margin: 20px auto;
+}
+
+/*canvas {
     text-align: center;
+}*/
+
+#tips {
+    text-align: left;
+    margin-left: 50px;
+}
+
+.tip-list {
+    padding-left: 20px;
 }

@@ -25,9 +25,13 @@ var Engine = (function(global) {
         ctx = canvas.getContext('2d'),
         lastTime;
 
+    var playground = document.getElementById("playground");
+    var tips = document.getElementById("tips");
+    // document.body.insertAfter(canvas, gameTips);
+
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
-    doc.body.appendChild(canvas);
+    playground.insertBefore(canvas, tips);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.

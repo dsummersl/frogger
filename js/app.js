@@ -24,6 +24,7 @@ var ENEMY_Y_OFFSET = -0.2;
 
 // flag for game not over
 var inGame = 'true';
+var win = 'false';
 
 // define an array as flag of being occupied by other elements,
 // such as rocks, other players;
@@ -159,6 +160,9 @@ Player.prototype.update = function() {
             theGem = new Gem();
             console.log(funObjIndex);
         }
+        else {
+            win = 'true';
+        }
     }
 
     // check if the currentPlayer got the star
@@ -185,7 +189,7 @@ Player.prototype.render = function() {
 // set move values according to user's keyboard input
 // check if the input counts for a move according to currentPlayer's position
 Player.prototype.handleInput = function(key) {
-    if (inGame == 'true') {
+    if (inGame == 'true' && win == 'false') {
         switch (key) {
             case 'left':
                 if (currentPlayer.x > 0 &&
@@ -316,20 +320,27 @@ var renderGameInfo = function() {
                   String.fromCharCode(9829) + ": " + starLife, WIDTH, 30);
 
     // game over
-    if (inGame == 'false') {
+    if (inGame == 'false' || win == 'true') {
         ctx.font = "60px 'Nunito Sans', sans-serif";
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", WIDTH/2, HEIGHT/2);
-        ctx.strokeText("GAME OVER", WIDTH/2, HEIGHT/2);
+        gameProcess = '';
+        if (inGame == 'false') {
+            gameProcess = 'GAME OVER';
+        }
+        else {
+            gameProcess = 'YOU WIN!';
+        }
+        ctx.fillText(gameProcess, WIDTH/2, HEIGHT/2);
+        ctx.strokeText(gameProcess, WIDTH/2, HEIGHT/2);
     }
 }
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = [new Enemy];
-// var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
+// var allEnemies = [new Enemy];
+var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
 
 // Place all player object in an array called allPlayers
 // Initialize the currentPlayer object to be the first in allPlayers array
