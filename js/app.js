@@ -120,6 +120,9 @@ var Player = function(char) {
 
     // set lives for the player
     this.lives = 2;
+
+    // flag for if the player crossed the river
+    this.succeed = 'false';
 }
 
 // Update the currentPlayer's position
@@ -136,15 +139,13 @@ Player.prototype.update = function() {
     this.posIndex = this.y * COLUMN + this.x;
 
     // check if the currentPlayer is now on the other side
-    if (this.y == 0) {
+    if (this.y == 0 && this.succeed == 'false') {
         if (currentPlayerNum < 4) {
             // add this player's position index into occupiedBlocks
             occupiedBlocks[this.posIndex] = 1;
 
-            // set currentPlayer to be the next player
-            currentPlayerNum++;
-            currentPlayer = allPlayers[currentPlayerNum];
-            currentPlayer.draw = 'true';
+            // flag: player is now on the other side
+            this.succeed = 'true';
 
             // new star and gem
             // if the star for previous player isn't got, don't create another
@@ -154,11 +155,11 @@ Player.prototype.update = function() {
             else {
                 if (Math.random() < 0.5) {
                     funObjIndex.splice(2, 2);
-                    theStar = new Star();
+                    theStar = new Star(funObjIndex);
                 }
             }
-            theGem = new Gem();
-            console.log(funObjIndex);
+            theGem = new Gem(funObjIndex);
+            // console.log(funObjIndex);
         }
         else {
             win = 'true';
@@ -192,13 +193,13 @@ Player.prototype.handleInput = function(key) {
     if (inGame == 'true' && win == 'false') {
         switch (key) {
             case 'left':
-                if (currentPlayer.x > 0 &&
+                if (this.x > 0 &&
                 occupiedBlocks[this.posIndex - 1] != 1) {
                     this.xMove = -1;
                 }
                 break;
             case 'up':
-                if (currentPlayer.y > 0 &&
+                if (this.y > 0 &&
                 occupiedBlocks[this.posIndex - COLUMN] != 1) {
                     if (currentPlayer.y == 2 && theGem.get == 'false') {
                         break;
@@ -207,13 +208,13 @@ Player.prototype.handleInput = function(key) {
                 }
                 break;
             case 'right':
-                if (currentPlayer.x < COLUMN - 1 &&
+                if (this.x < COLUMN - 1 &&
                 occupiedBlocks[this.posIndex + 1] != 1) {
                     this.xMove = 1;
                 }
                 break;
             case 'down':
-                if (currentPlayer.y < ROW - 1 &&
+                if (this.y < ROW - 1 &&
                 occupiedBlocks[this.posIndex + COLUMN] != 1) {
                     this.yMove = 1;
                 }
@@ -224,83 +225,98 @@ Player.prototype.handleInput = function(key) {
     }
 }
 
-// generate unique index for "fun" objects, such as rocks, star, Gem
-var funIndexGenerator = function(funObjIndex, numOfRow) {
+// check and display new player
+var showNewPlayer = function() {
+  for (var i = 0; i < allPlayers.length - 1; i++) {
+    if (allPlayers[i].succeed == 'true' && allPlayers[i+1].draw == 'false') {
+      currentPlayerNum++;
+      currentPlayer = allPlayers[currentPlayerNum];
+      currentPlayer.draw = 'true';
+    }
+  }
+}
+
+// super class for fun objects -- rocks, stars, gems
+var FunObjs = function(funObjIndex, numOfRow) {
+    this.funIndexGenerator(funObjIndex, numOfRow);
+    this.y = Math.floor(this.posIndex/COLUMN);
+    this.x = this.posIndex - this.y * COLUMN;
+}
+
+// generate unique index
+FunObjs.prototype.funIndexGenerator = function(funObjIndex, numOfRow) {
     // numOfRow: started from row2, the number of rows that the object could appear
     // fun objects can't appear on the player's initial position
     funObjIndex.unshift(PLAYER_Y * COLUMN + PLAYER_X);
     // fun objects should have non-repeat indices
     do {
-        var tempIndex = 2 * COLUMN + Math.floor(numOfRow * COLUMN * Math.random());
-        var exist = funObjIndex.indexOf(tempIndex) !== -1;
+        this.posIndex = 2 * COLUMN + Math.floor(numOfRow * COLUMN * Math.random());
+        var exist = funObjIndex.indexOf(this.posIndex) !== -1;
     } while (exist);
-    funObjIndex.push(tempIndex);
+    funObjIndex.push(this.posIndex);
     // the player's initial index is actually not a funObjIndex, so shift it out
     funObjIndex.shift();
-    return tempIndex;
 }
 
 // rock class, occupy blocks so that player can't get in
-var Rock = function() {
-    this.sprite = 'images/Rock.png';
+var Rock = function(funObjIndex) {
 
-    // add rock's position index into occupiedBlocks
-    this.posIndex = funIndexGenerator(funObjIndex, 4);
-    occupiedBlocks[this.posIndex] = 1;
-
+    // Rock is a subclass of FunObjs
     // rocks appear in row2 ~ row5
-    this.y = Math.floor(this.posIndex/COLUMN);
-    this.x = this.posIndex - this.y * COLUMN;
+    FunObjs.call(this, funObjIndex, 4);
 
-    // draw the rock
-    this.render = function() {
-        ctx.drawImage(Resources.get(this.sprite),
-                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
-    }
+    this.sprite = 'images/Rock.png';
+}
+// implement delegation
+Rock.prototype = Object.create(FunObjs.prototype);
+Rock.prototype.constructor = Rock;
+Rock.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite),
+                  this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
 }
 
 // star class, gives player extra life that can be passed to the next
-var Star = function() {
-    this.sprite = 'images/Star.png';
+var Star = function(funObjIndex) {
 
-    // generate index for the star
-    this.posIndex = funIndexGenerator(funObjIndex, 3);
-
+    // Star is a subclass of FunObjs
     // star appear in row2 ~ row4
-    this.y = Math.floor(this.posIndex/COLUMN);
-    this.x = this.posIndex - this.y * COLUMN;
+    FunObjs.call(this, funObjIndex, 3);
+
+    this.sprite = 'images/Star.png';
 
     // flag for being got by player
     this.get = 'false';
 
-    // draw the star
-    this.render = function() {
-        if (this.get == 'false') {
-            ctx.drawImage(Resources.get(this.sprite),
-                          this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
-        }
+}
+// implement delegation
+Star.prototype = Object.create(FunObjs.prototype);
+Star.prototype.constructor = Star;
+Star.prototype.render = function() {
+    if (this.get == 'false') {
+        ctx.drawImage(Resources.get(this.sprite),
+                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
     }
 }
 
 // gem class, enables player to cross water
-var Gem = function() {
-    this.sprite = 'images/Gem.png';
+var Gem = function(funObjIndex) {
 
-    // generate index for the star
-    this.posIndex = funIndexGenerator(funObjIndex, 3);
-
+    // Gem is a subclass of FunObjs
     // Gem appear in row2 ~ row4
-    this.y = Math.floor(this.posIndex/COLUMN);
-    this.x = this.posIndex - this.y * COLUMN;
+    FunObjs.call(this, funObjIndex, 3);
+
+    this.sprite = 'images/Gem.png';
 
     // flag for being got by player
     this.get = 'false';
 
-    // draw the gem
-    this.render = function() {
-        ctx.drawImage(Resources.get(this.sprite),
-                      this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
-    }
+}
+// implement delegation
+Gem.prototype = Object.create(FunObjs.prototype);
+Gem.prototype.constructor = Gem;
+Gem.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite),
+                  this.x * BLOCK_WIDTH, this.y * BLOCK_HEIGHT);
 }
 
 // display game information, such as current player, lives left, game over
@@ -317,7 +333,7 @@ var renderGameInfo = function() {
     // lives left
     ctx.textAlign = "right";
     ctx.fillText("lives: " + currentPlayer.lives + "    " +
-                  String.fromCharCode(9829) + ": " + starLife, WIDTH, 30);
+                  String.fromCharCode(9733) + ": " + starLife, WIDTH, 30);
 
     // game over
     if (inGame == 'false' || win == 'true') {
@@ -346,6 +362,7 @@ var allEnemies = [new Enemy, new Enemy, new Enemy, new Enemy];
 // Initialize the currentPlayer object to be the first in allPlayers array
 var allPlayers = [new Player('boy'), new Player('pink-girl'), new Player('cat-girl'),
                   new Player('horn-girl'), new Player('princess-girl')];
+
 var currentPlayerNum = 0;
 var currentPlayer = allPlayers[currentPlayerNum];
 currentPlayer.draw = 'true';
@@ -354,16 +371,21 @@ currentPlayer.draw = 'true';
 var funObjIndex = [];
 
 // Initialize 2 rocks
-var allRocks = [new Rock(), new Rock()];
+var allRocks = [new Rock(funObjIndex), new Rock(funObjIndex)];
+
+// add rock's position index into occupiedBlocks
+for (var i = 0; i < allRocks.length; i++) {
+    occupiedBlocks[allRocks[i].posIndex] = 1;
+}
 
 // Initialize 1 Star, 50% possibility to meet star per player
 if (Math.random() < 0.5) {
-    var theStar = new Star();
+    var theStar = new Star(funObjIndex);
 }
 
 // Initialize 1 Gem
-var theGem = new Gem();
-console.log(funObjIndex);
+var theGem = new Gem(funObjIndex);
+// console.log(funObjIndex);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -377,3 +399,6 @@ document.addEventListener('keyup', function(e) {
 
     currentPlayer.handleInput(allowedKeys[e.keyCode]);
 });
+
+// check and display new player
+window.setInterval(showNewPlayer, 300);
