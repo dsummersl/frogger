@@ -13,7 +13,7 @@ player.
 
 ## How to play:
 1. Clone the repository then open index.html in your browser, or just go to
-this [GitHub Pages](https://xdudu.github.io/Frogger_exercise/) to play online~
+this [GitHub Pages](https://xdudu.github.io/frogger/) to play online~
 2. The game starts as the page successfuly loads, so you can begin playing as you see
 bugs moving on the screen.
 3. Use arrow keys to move the player.
