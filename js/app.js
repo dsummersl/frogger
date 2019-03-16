@@ -35,6 +35,16 @@ var occupiedBlocks = [];
 // number of stars, represent for extra life
 var starLife = 0;
 
+var levels = [
+  new Level('Weaver St', 9100),
+  new Level('Rosemary St', 8700),
+  new Level('Franklin St', 18000),
+];
+
+var currentLevelIndex = 0;
+
+// Move all the enemies creation into the level
+
 // Enemies our currentPlayer must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -48,6 +58,7 @@ var Enemy = function() {
     // x: set the Enemy to be out of the canvas
     // y: set the Enemy to be in a random row of 3 stone rows
     this.x = -3 + 2 * Math.random();
+    // TODO this depends on the number of lanes
     this.y = ENEMY_Y_OFFSET + (Math.floor(3 * Math.random()) + 2);
 
     // set speed for a Enemy within [30, 70)
@@ -61,7 +72,8 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    // if the bug crawls out of canvas, innitialize its position and speed again
+    // if the enemy crawls off the canvas, reconfigure on a new column and
+    // speed.
     if (this.x > COLUMN) {
         Enemy.call(this);
     }
@@ -329,7 +341,12 @@ var renderStreetName = function() {
     ctx.font = "24px 'Nunito Sans', sans-serif";
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.fillText("STREET", WIDTH / 2, HEIGHT - 70, WIDTH);
+    ctx.fillText(levels[currentLevelIndex].name, WIDTH / 2, HEIGHT - 70, WIDTH);
+
+    ctx.fillStyle = "orange";
+    ctx.font = "14px 'Nunito Sans', sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText('' + levels[currentLevelIndex].carsPerDay + ' cars a day', WIDTH, HEIGHT - 70, WIDTH);
 }
 
 

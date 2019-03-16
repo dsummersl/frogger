@@ -108,22 +108,22 @@ var Engine = (function(global) {
      * they are just drawing the entire screen over and over.
      */
     function render() {
+        // TODO render the level background
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
         var rowImages = [
                 'images/grass-block.png',   // Top row is grass
-                'images/road.png',   // Row 1 of 1 of water
-                'images/road.png',   // Row 1 of 3 of stone
-                'images/road.png',   // Row 2 of 3 of stone
-                'images/road.png',   // Row 3 of 3 of stone
+                'images/BetterRoad.png',   // Row 1 of 1 of water
+                'images/BetterRoad.png',   // Row 1 of 3 of stone
+                'images/BetterRoad.png',   // Row 2 of 3 of stone
+                'images/BetterRoad.png',   // Row 3 of 3 of stone
                 'images/grass-block.png'    // Row 1 of 1 of grass
             ],
             numRows = 6,
             numCols = 5,
             row, col;
 
-        // TODO make this a formal level builder.
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
@@ -183,7 +183,7 @@ var Engine = (function(global) {
      * all of these images are properly loaded our game will start.
      */
     Resources.load([
-        'images/road.png',
+        'images/BetterRoad.png',
         'images/water-block.png',
         'images/grass-block.png',
         'images/car.png',
