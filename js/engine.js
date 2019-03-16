@@ -113,7 +113,7 @@ var Engine = (function(global) {
          */
         var rowImages = [
                 'images/grass-block.png',   // Top row is grass
-                'images/water-block.png',   // Row 1 of 1 of water
+                'images/stone-block.png',   // Row 1 of 1 of water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
                 'images/stone-block.png',   // Row 3 of 3 of stone
@@ -123,6 +123,7 @@ var Engine = (function(global) {
             numCols = 5,
             row, col;
 
+        // TODO make this a formal level builder.
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
@@ -151,11 +152,6 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        if (typeof(theStar) != 'undefined') {
-            theStar.render();
-        }
-
-        theGem.render();
 
         allRocks.forEach(function(rock) {
             rock.render();

@@ -127,13 +127,6 @@ var Player = function(char) {
 
 // Update the currentPlayer's position
 Player.prototype.update = function() {
-    // check if the currentPlayer got the gem
-    if (this.x == theGem.x && this.y == theGem.y) {
-        theGem.get = 'true';
-        theGem.x += this.xMove;
-        theGem.y += this.yMove;
-    }
-
     this.x += this.xMove;
     this.y += this.yMove;
     this.posIndex = this.y * COLUMN + this.x;
@@ -146,31 +139,10 @@ Player.prototype.update = function() {
 
             // flag: player is now on the other side
             this.succeed = 'true';
-
-            // new star and gem
-            // if the star for previous player isn't got, don't create another
-            if (typeof theStar != 'undefined' && theStar.get == 'false') {
-                funObjIndex.splice(3, 1);
-            }
-            else {
-                if (Math.random() < 0.5) {
-                    funObjIndex.splice(2, 2);
-                    theStar = new Star(funObjIndex);
-                }
-            }
-            theGem = new Gem(funObjIndex);
             // console.log(funObjIndex);
         }
         else {
             win = 'true';
-        }
-    }
-
-    // check if the currentPlayer got the star
-    if (typeof theStar != 'undefined') {
-        if (this.x == theStar.x && this.y == theStar.y && theStar.get == 'false') {
-            theStar.get = 'true';
-            starLife++;
         }
     }
 
@@ -201,7 +173,7 @@ Player.prototype.handleInput = function(key) {
             case 'up':
                 if (this.y > 0 &&
                 occupiedBlocks[this.posIndex - COLUMN] != 1) {
-                    if (currentPlayer.y == 2 && theGem.get == 'false') {
+                    if (currentPlayer.y === 2) {
                         break;
                     }
                     this.yMove = -1;
@@ -332,8 +304,7 @@ var renderGameInfo = function() {
 
     // lives left
     ctx.textAlign = "right";
-    ctx.fillText("lives: " + currentPlayer.lives + "    " +
-                  String.fromCharCode(9733) + ": " + starLife, WIDTH, 30);
+    ctx.fillText("lives: " + currentPlayer.lives, WIDTH, 30);
 
     // game over
     if (inGame == 'false' || win == 'true') {
@@ -377,15 +348,6 @@ var allRocks = [new Rock(funObjIndex), new Rock(funObjIndex)];
 for (var i = 0; i < allRocks.length; i++) {
     occupiedBlocks[allRocks[i].posIndex] = 1;
 }
-
-// Initialize 1 Star, 50% possibility to meet star per player
-if (Math.random() < 0.5) {
-    var theStar = new Star(funObjIndex);
-}
-
-// Initialize 1 Gem
-var theGem = new Gem(funObjIndex);
-// console.log(funObjIndex);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
