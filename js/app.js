@@ -36,12 +36,16 @@ var occupiedBlocks = [];
 var starLife = 0;
 
 var levels = [
-  new Level('Weaver St', 9100),
-  new Level('Rosemary St', 8700),
-  new Level('Franklin St', 18000),
+  new Level('Weaver St', 9100, 2),
+  new Level('Rosemary St', 8700, 2),
+  new Level('Franklin St', 18000, 4),
 ];
 
 var currentLevelIndex = 0;
+
+function getCurrentLevel() {
+    return levels[currentLevelIndex];
+}
 
 // Move all the enemies creation into the level
 
@@ -52,17 +56,26 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/car.png';
+    var cars = [
+        'images/Greencar.png',
+        'images/Purplecar.png',
+        'images/Bluecar.png',
+        'images/VeryBluecar.png',
+    ];
+    this.sprite = cars[Math.floor(Math.random() * cars.length)];
+    // TODO load the car colors
 
     // initialize position of a Enemy
     // x: set the Enemy to be out of the canvas
     // y: set the Enemy to be in a random row of 3 stone rows
     this.x = -3 + 2 * Math.random();
-    // TODO this depends on the number of lanes
-    this.y = ENEMY_Y_OFFSET + (Math.floor(3 * Math.random()) + 2);
+    var lanes = getCurrentLevel().lanes;
+    var startLaneOffset = lanes === 4 ? 1:2;
+    this.y = ENEMY_Y_OFFSET + (Math.floor((lanes) * Math.random()) + startLaneOffset);
 
     // set speed for a Enemy within [30, 70)
-    this.speed = 2.5 + 3 * (Math.random() - 0.5);
+    // TODO make level determine car speeds.
+    this.speed = 3.5 + 3 * (Math.random() - 0.5);
 };
 
 // Update the enemy's position, required method for game
@@ -131,7 +144,7 @@ var Player = function(char) {
     this.posIndex = this.y * COLUMN + this.x;
 
     // set lives for the player
-    this.lives = 2;
+    this.lives = 5;
 
     // flag for if the player crossed the river
     this.succeed = 'false';
@@ -341,12 +354,12 @@ var renderStreetName = function() {
     ctx.font = "24px 'Nunito Sans', sans-serif";
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.fillText(levels[currentLevelIndex].name, WIDTH / 2, HEIGHT - 70, WIDTH);
+    ctx.fillText(getCurrentLevel().name, WIDTH / 2, HEIGHT - 70, WIDTH);
 
     ctx.fillStyle = "orange";
     ctx.font = "14px 'Nunito Sans', sans-serif";
     ctx.textAlign = "right";
-    ctx.fillText('' + levels[currentLevelIndex].carsPerDay + ' cars a day', WIDTH, HEIGHT - 70, WIDTH);
+    ctx.fillText('' + getCurrentLevel().carsPerDay + ' cars a day', WIDTH, HEIGHT - 70, WIDTH);
 }
 
 

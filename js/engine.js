@@ -112,17 +112,24 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
+        var grassImage = 'images/grass-block.png';
+        var roadImage = 'images/BetterRoad.png';
         var rowImages = [
-                'images/grass-block.png',   // Top row is grass
-                'images/BetterRoad.png',   // Row 1 of 1 of water
-                'images/BetterRoad.png',   // Row 1 of 3 of stone
-                'images/BetterRoad.png',   // Row 2 of 3 of stone
-                'images/BetterRoad.png',   // Row 3 of 3 of stone
-                'images/grass-block.png'    // Row 1 of 1 of grass
+                grassImage,
+                grassImage,
+                roadImage,
+                roadImage,
+                grassImage,
+                grassImage,
             ],
             numRows = 6,
             numCols = 5,
             row, col;
+
+        if (getCurrentLevel().lanes === 4) {
+            rowImages[1] = roadImage;
+            rowImages[4] = roadImage;
+        }
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -186,7 +193,10 @@ var Engine = (function(global) {
         'images/BetterRoad.png',
         'images/water-block.png',
         'images/grass-block.png',
-        'images/car.png',
+        'images/Greencar.png',
+        'images/Purplecar.png',
+        'images/Bluecar.png',
+        'images/VeryBluecar.png',
         'images/char-boy.png',
         'images/char-pink-girl.png',
         'images/char-cat-girl.png',
