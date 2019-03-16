@@ -173,9 +173,6 @@ Player.prototype.handleInput = function(key) {
             case 'up':
                 if (this.y > 0 &&
                 occupiedBlocks[this.posIndex - COLUMN] != 1) {
-                    if (currentPlayer.y === 2) {
-                        break;
-                    }
                     this.yMove = -1;
                 }
                 break;
