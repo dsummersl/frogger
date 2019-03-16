@@ -113,10 +113,10 @@ var Engine = (function(global) {
          */
         var rowImages = [
                 'images/grass-block.png',   // Top row is grass
-                'images/stone-block.png',   // Row 1 of 1 of water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
+                'images/road.png',   // Row 1 of 1 of water
+                'images/road.png',   // Row 1 of 3 of stone
+                'images/road.png',   // Row 2 of 3 of stone
+                'images/road.png',   // Row 3 of 3 of stone
                 'images/grass-block.png'    // Row 1 of 1 of grass
             ],
             numRows = 6,
@@ -183,10 +183,10 @@ var Engine = (function(global) {
      * all of these images are properly loaded our game will start.
      */
     Resources.load([
-        'images/stone-block.png',
+        'images/road.png',
         'images/water-block.png',
         'images/grass-block.png',
-        'images/enemy-bug.png',
+        'images/car.png',
         'images/char-boy.png',
         'images/char-pink-girl.png',
         'images/char-cat-girl.png',

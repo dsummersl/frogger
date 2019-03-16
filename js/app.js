@@ -42,7 +42,7 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
+    this.sprite = 'images/car.png';
 
     // initialize position of a Enemy
     // x: set the Enemy to be out of the canvas
