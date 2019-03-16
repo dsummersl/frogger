@@ -167,6 +167,7 @@ var Engine = (function(global) {
         });
 
         renderGameInfo();
+        renderStreetName();
     }
 
     /* This function does nothing but it could have been a good place to

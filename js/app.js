@@ -13,7 +13,7 @@ var COLUMN = 5;
 
 // size of canvas
 var WIDTH = BLOCK_WIDTH * COLUMN;
-var HEIGHT = BLOCK_HEIGHT * ROW + 100;
+var HEIGHT = BLOCK_HEIGHT * ROW + 100 + 100;
 
 // initial position of the player
 var PLAYER_X = 2;
@@ -320,6 +320,18 @@ var renderGameInfo = function() {
         ctx.strokeText(gameProcess, WIDTH/2, HEIGHT/2);
     }
 }
+
+var renderStreetName = function() {
+    // the current player
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, HEIGHT - 100, WIDTH, 40);
+
+    ctx.font = "24px 'Nunito Sans', sans-serif";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+    ctx.fillText("STREET", WIDTH / 2, HEIGHT - 70, WIDTH);
+}
+
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
