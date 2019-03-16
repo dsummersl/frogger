@@ -23,8 +23,8 @@ var PLAYER_Y = 5;
 var ENEMY_Y_OFFSET = -0.2;
 
 // flag for game not over
-var inGame = 'true';
-var win = 'false';
+var inGame = true;
+var win = false;
 
 // define an array as flag of being occupied by other elements,
 // such as rocks, other players;
@@ -75,7 +75,7 @@ var Enemy = function() {
 
     // set speed for a Enemy within [30, 70)
     // TODO make level determine car speeds.
-    this.speed = 3.5 + 3 * (Math.random() - 0.5);
+    this.speed = 1.5 + 2 * (Math.random() - 0.5);
 };
 
 // Update the enemy's position, required method for game
@@ -99,7 +99,7 @@ Enemy.prototype.update = function(dt) {
     if (Math.abs(this.x - currentPlayer.x) < 1 - 0.24 &&
         Math.abs((this.y - ENEMY_Y_OFFSET) - currentPlayer.y) < 1) {
         if (starLife + currentPlayer.lives == 1) {
-            inGame = 'false';
+            inGame = false;
         }
         if (currentPlayer.lives == 0) {
             starLife--;
@@ -167,7 +167,7 @@ Player.prototype.update = function() {
             // console.log(funObjIndex);
         }
         else {
-            win = 'true';
+            win = true;
         }
     }
 
@@ -187,7 +187,7 @@ Player.prototype.render = function() {
 // set move values according to user's keyboard input
 // check if the input counts for a move according to currentPlayer's position
 Player.prototype.handleInput = function(key) {
-    if (inGame == 'true' && win == 'false') {
+    if (inGame && !win) {
         switch (key) {
             case 'left':
                 if (this.x > 0 &&
@@ -329,13 +329,13 @@ var renderGameInfo = function() {
     ctx.fillText("lives: " + currentPlayer.lives, WIDTH, 30);
 
     // game over
-    if (inGame == 'false' || win == 'true') {
+    if (!inGame || win) {
         ctx.font = "60px 'Nunito Sans', sans-serif";
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
         ctx.textAlign = "center";
         gameProcess = '';
-        if (inGame == 'false') {
+        if (!inGame) {
             gameProcess = 'GAME OVER';
         }
         else {

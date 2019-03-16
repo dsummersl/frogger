@@ -20,7 +20,7 @@ var Engine = (function(global) {
      * set the canvas elements height/width and add it to the DOM.
      */
     var doc = global.document,
-        win = global.window,
+        global_window = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime;
@@ -60,7 +60,7 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        global_window.requestAnimationFrame(main);
     }
 
     /* This function does some initial setup that should only occur once,
