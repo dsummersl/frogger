@@ -129,25 +129,7 @@ var Player = function(char) {
     // set sprite for the Player according to its character set
     this.sprite = 'images/char-' + char + '.png';
 
-    // decide if the player should be drawn according to game process
-    this.draw = 'false';
-
-    // initialize position of the Player
-    this.x = PLAYER_X;
-    this.y = PLAYER_Y;
-
-    // move values for updating the position, acquired in .handleInput()
-    this.xMove = 0;
-    this.yMove = 0;
-
-    // position index of the player in the blockMatrix
-    this.posIndex = this.y * COLUMN + this.x;
-
-    // set lives for the player
-    this.lives = 5;
-
-    // flag for if the player crossed the river
-    this.succeed = 'false';
+    this.reset();
 }
 
 // Update the currentPlayer's position
@@ -174,6 +156,28 @@ Player.prototype.update = function() {
     // reset move values
     this.xMove = 0;
     this.yMove = 0;
+}
+
+Player.prototype.reset = function() {
+    // decide if the player should be drawn according to game process
+    this.draw = 'false';
+
+    // initialize position of the Player
+    this.x = PLAYER_X;
+    this.y = PLAYER_Y;
+
+    // move values for updating the position, acquired in .handleInput()
+    this.xMove = 0;
+    this.yMove = 0;
+
+    // position index of the player in the blockMatrix
+    this.posIndex = this.y * COLUMN + this.x;
+
+    // set lives for the player
+    this.lives = 5;
+
+    // flag for if the player crossed the river
+    this.succeed = 'false';
 }
 
 // Draw the player(s) on the screen
@@ -417,10 +421,18 @@ document.addEventListener('keyup', function(e) {
 });
 
 function checkLevelChangeCondition() {
-    if (!inGame && currentLevelIndex < levels.length - 1) {
+    if (win && currentLevelIndex < levels.length - 1) {
         inGame = true;
         win = false;
         currentLevelIndex++;
+
+        for (var i=0; i<allPlayers.length; i++) {
+            allPlayers[i].reset();
+        }
+
+        currentPlayerNum = 0;
+        currentPlayer = allPlayers[currentPlayerNum];
+        currentPlayer.draw = 'true';
     }
 }
 
