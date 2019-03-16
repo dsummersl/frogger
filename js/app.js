@@ -174,7 +174,7 @@ Player.prototype.reset = function() {
     this.posIndex = this.y * COLUMN + this.x;
 
     // set lives for the player
-    this.lives = 5;
+    this.lives = 3;
 
     // flag for if the player crossed the river
     this.succeed = 'false';
@@ -356,7 +356,7 @@ var renderGameInfo = function() {
         else {
             if (currentLevelIndex < levels.length) {
                 gameProcess = 'GOOD JOB...';
-                setTimeout(checkLevelChangeCondition, 3000);
+                setTimeout(checkLevelChangeCondition, 1500);
             } else {
                 gameProcess = 'YOU WIN!';
             }
