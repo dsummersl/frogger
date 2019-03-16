@@ -157,7 +157,7 @@ Player.prototype.update = function() {
     this.posIndex = this.y * COLUMN + this.x;
 
     // check if the currentPlayer is now on the other side
-    if (this.y == 0 && this.succeed == 'false') {
+    if (this.y === 0 && this.succeed === 'false') {
         if (currentPlayerNum < 4) {
             // add this player's position index into occupiedBlocks
             occupiedBlocks[this.posIndex] = 1;
@@ -233,7 +233,18 @@ var showNewPlayer = function() {
 // super class for fun objects -- rocks, stars, gems
 var FunObjs = function(funObjIndex, numOfRow) {
     this.funIndexGenerator(funObjIndex, numOfRow);
-    this.y = Math.floor(this.posIndex/COLUMN);
+    this.y = 1 + Math.floor(this.posIndex/COLUMN - 1);
+    // A rock can't be in the road!
+    if (getCurrentLevel().lanes === 4) {
+        this.y = 4;
+    } else {
+        if (this.y === 2) {
+            this.y = 1;
+        }
+        if (this.y === 3) {
+            this.y = 4;
+        }
+    }
     this.x = this.posIndex - this.y * COLUMN;
 }
 
@@ -339,7 +350,11 @@ var renderGameInfo = function() {
             gameProcess = 'GAME OVER';
         }
         else {
-            gameProcess = 'YOU WIN!';
+            if (currentLevelIndex < levels.length) {
+                gameProcess = 'GOOD JOB...';
+            } else {
+                gameProcess = 'YOU WIN!';
+            }
         }
         ctx.fillText(gameProcess, WIDTH/2, HEIGHT/2);
         ctx.strokeText(gameProcess, WIDTH/2, HEIGHT/2);
@@ -401,5 +416,14 @@ document.addEventListener('keyup', function(e) {
     currentPlayer.handleInput(allowedKeys[e.keyCode]);
 });
 
+function checkLevelChangeCondition() {
+    if (!inGame && currentLevelIndex < levels.length - 1) {
+        inGame = true;
+        win = false;
+        currentLevelIndex++;
+    }
+}
+
 // check and display new player
 window.setInterval(showNewPlayer, 300);
+window.setInterval(checkLevelChangeCondition, 3000);

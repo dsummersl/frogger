@@ -112,15 +112,15 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
-        var grassImage = 'images/grass-block.png';
+        var sidewalk = 'images/Sidewalk.png';
         var roadImage = 'images/BetterRoad.png';
         var rowImages = [
-                grassImage,
-                grassImage,
+                sidewalk,
+                sidewalk,
                 roadImage,
                 roadImage,
-                grassImage,
-                grassImage,
+                sidewalk,
+                sidewalk,
             ],
             numRows = 6,
             numCols = 5,
@@ -192,7 +192,7 @@ var Engine = (function(global) {
     Resources.load([
         'images/BetterRoad.png',
         'images/water-block.png',
-        'images/grass-block.png',
+        'images/Sidewalk.png',
         'images/Greencar.png',
         'images/Purplecar.png',
         'images/Bluecar.png',
