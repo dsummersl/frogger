@@ -356,6 +356,7 @@ var renderGameInfo = function() {
         else {
             if (currentLevelIndex < levels.length) {
                 gameProcess = 'GOOD JOB...';
+                setTimeout(checkLevelChangeCondition, 3000);
             } else {
                 gameProcess = 'YOU WIN!';
             }
@@ -433,9 +434,10 @@ function checkLevelChangeCondition() {
         currentPlayerNum = 0;
         currentPlayer = allPlayers[currentPlayerNum];
         currentPlayer.draw = 'true';
+
+        occupiedBlocks = [];
     }
 }
 
 // check and display new player
 window.setInterval(showNewPlayer, 300);
-window.setInterval(checkLevelChangeCondition, 3000);
